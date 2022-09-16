@@ -1,13 +1,13 @@
 import { CustomAuthorizerEvent, CustomAuthorizerResult } from 'aws-lambda'
 import 'source-map-support/register'
 
-import { verify, decode, jwksClient } from 'jsonwebtoken'
+import { verify, decode, VerifyErrors, Secret} from 'jsonwebtoken'
 import { createLogger } from '../../utils/logger'
-import Axios from 'axios'
 import { Jwt } from '../../auth/Jwt'
 import { JwtPayload } from '../../auth/JwtPayload'
 
 const logger = createLogger('auth')
+var jwksClient = require('jwks-rsa');
 
 // TODO: Provide a URL that can be used to download a certificate that can be used
 // to verify JWT token signature.
@@ -18,15 +18,16 @@ const kid = 'aloaloalo'
 var client = jwksClient({
   jwksUri: jwksUrl
 });
-async function getKey(){
-  client.getSigningKey(kid, function(err: Error, key) {
+function getKey(): Secret {
+  let signingKey: Secret
+  client.getSigningKey(kid, function(err: VerifyErrors, key: Secret) {
     if (err) {
       logger.error("Unexpected get JWT error")
       return undefined;
     }
-    var signingKey = key.publicKey || key.rsaPublicKey;
-    return signingKey;
+    signingKey = key
   });
+  return signingKey;
 }
 
 export const handler = async (
@@ -73,19 +74,20 @@ async function verifyToken(authHeader: string): Promise<JwtPayload> {
   const token = getToken(authHeader)
   const jwt: Jwt = decode(token, { complete: true }) as Jwt
   logger.info("Plain JWT: " + jwt)
-  let jwtPayload:JwtPayload
+  let jwtPayload
   try {
-    jwtPayload = verify(jwt, getKey())
+    jwtPayload = verify(token, getKey())
   } catch (exception) {
     logger.error(exception.message)
     throw new Error('Invalid JWT token')
   }
-  
+  let result: JwtPayload
+  result = jwtPayload
 
   // TODO: Implement token verification
   // You should implement it similarly to how it was implemented for the exercise for the lesson 5
   // You can read more about how to do this here: https://auth0.com/blog/navigating-rs256-and-jwks/
-  return jwtPayload
+  return result
 }
 
 function getToken(authHeader: string): string {
