@@ -14,20 +14,17 @@ export const handler = middy(
     const updatedTodo: UpdateTodoRequest = JSON.parse(event.body)
     // TODO: Update a TODO item with the provided id using values in the "updatedTodo" object
     let userId: string = getUserId(event)
-    let result = await updateTodo(updatedTodo, todoId, userId)
+    await updateTodo(updatedTodo, todoId, userId)
 
     return {
       statusCode: 201,
-      body: JSON.stringify({
-        result
-      }),
+      body: '',
       headers: {
         'Access-Control-Allow-Origin': '*'
       }
     }
   }
 )
-
 handler
   .use(httpErrorHandler())
   .use(

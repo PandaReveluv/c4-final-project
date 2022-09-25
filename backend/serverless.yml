@@ -193,8 +193,6 @@ resources:
                 - HEAD
               AllowedOrigins:
                 - '*'
-              ExposedHeaders:
-                - Date
               Id: myCORSRuleId1
               MaxAge: 3600
 
