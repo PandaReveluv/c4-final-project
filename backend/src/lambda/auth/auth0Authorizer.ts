@@ -17,15 +17,16 @@ const jwksUrl = 'https://dev-q1cnabul.us.auth0.com/.well-known/jwks.json'
 var client = jwksClient({
   jwksUri: jwksUrl
 });
-async function getKey(header, callback) {
-  client.getSigningKey(header.pid, function(err, key) {
-    if (err) {
-      logger.error("Unexpected get JWT error")
-      return undefined;
-    }
-    var signingKey = key.publicKey || key.rsaPublicKey;
-    callback(null, signingKey)
-  });
+async function getKey(jwtKid) {
+  let key
+  try {
+    key = await client.getSigningKey(jwtKid)
+  } catch (e) {
+    logger.error(e.message)
+    throw new Error('Unexpected get JWT error')
+  }
+  let signingKey = key.publicKey || key.rsaPublicKey;
+  return signingKey
 }
 
 export const handler = async (
@@ -71,24 +72,23 @@ export const handler = async (
 async function verifyToken(authHeader: string): Promise<JwtPayload> {
   const token = getToken(authHeader)
   const jwt: Jwt = decode(token, { complete: true }) as Jwt
+  const jwtKid = jwt.header.kid;
   let result = jwt.payload
   logger.info("Plain JWT: " + jwt.payload)
-  verify(token, getKey, function(err, decodedJwtPayload) {
-    if (err) {
-      logger.error(err.message)
-      throw new Error('Invalid JWT token')
-    }
+  try {
+    let decodedJwtPayload = verify(token, await getKey(jwtKid))
     if (decodedJwtPayload['sub'] != result.sub
     || decodedJwtPayload['iss'] != result.iss
     || decodedJwtPayload['iat'] != result.iat
     || decodedJwtPayload['exp'] != result.exp
     ) {
+      logger.error('Incorrect JWT token')
       throw new Error('Incorrect JWT token')
     }
-  });
-  // TODO: Implement token verification
-  // You should implement it similarly to how it was implemented for the exercise for the lesson 5
-  // You can read more about how to do this here: https://auth0.com/blog/navigating-rs256-and-jwks/
+  } catch (e) {
+    logger.error(e.message)
+    throw new Error('Invalid JWT token')
+  }
   return result
 }
 
