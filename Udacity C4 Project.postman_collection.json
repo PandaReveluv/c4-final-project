@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "d0700d24-79ec-487e-8403-b565bef7f8e0",
+		"_postman_id": "beef4f9f-8ba4-4383-9c06-090b05f96e56",
 		"name": "Udacity C4 Project",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -19,10 +19,6 @@
 								"type": "text"
 							}
 						],
-						"body": {
-							"mode": "raw",
-							"raw": ""
-						},
 						"url": {
 							"raw": "https://{{apiId}}.execute-api.us-east-1.amazonaws.com/dev/todos",
 							"protocol": "https",
@@ -83,7 +79,7 @@
 				{
 					"name": "Update todo",
 					"request": {
-						"method": "PUT",
+						"method": "PATCH",
 						"header": [
 							{
 								"key": "Content-Type",
@@ -99,10 +95,15 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n\t\"name\": \"Change the world\",\n\t\"dueDate\": \"2019-12-11\",\n\t\"done\": true\n}"
+							"raw": "{\n\t\"name\": \"hello\",\n\t\"dueDate\": \"2022-10-03\",\n\t\"done\": true\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
 						},
 						"url": {
-							"raw": "https://{{apiId}}.execute-api.us-east-1.amazonaws.com/dev/todos/35dd600f-43c2-4649-903c-615e1586a26f",
+							"raw": "https://{{apiId}}.execute-api.us-east-1.amazonaws.com/dev/todos/bbb5955d-4693-4b95-b379-72a0abd9fd39",
 							"protocol": "https",
 							"host": [
 								"{{apiId}}",
@@ -114,7 +115,7 @@
 							"path": [
 								"dev",
 								"todos",
-								"35dd600f-43c2-4649-903c-615e1586a26f"
+								"bbb5955d-4693-4b95-b379-72a0abd9fd39"
 							]
 						}
 					},
@@ -200,7 +201,6 @@
 				{
 					"listen": "prerequest",
 					"script": {
-						"id": "ce2b42d4-8cc5-4f30-a6ed-e7f0f303c3fd",
 						"type": "text/javascript",
 						"exec": [
 							""
@@ -210,7 +210,6 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "efb16c49-3866-4241-97d1-360ad72736d8",
 						"type": "text/javascript",
 						"exec": [
 							""
@@ -224,7 +223,6 @@
 		{
 			"listen": "prerequest",
 			"script": {
-				"id": "2e83c0fe-6650-44d5-a90f-4c27ff720d83",
 				"type": "text/javascript",
 				"exec": [
 					""
@@ -234,7 +232,6 @@
 		{
 			"listen": "test",
 			"script": {
-				"id": "977c227e-2df3-42eb-9a48-ec25e2f7eeae",
 				"type": "text/javascript",
 				"exec": [
 					""
@@ -244,13 +241,11 @@
 	],
 	"variable": [
 		{
-			"id": "bf208e6b-f66d-4008-9366-dd541ff65425",
 			"key": "apiId",
 			"value": "",
 			"type": "string"
 		},
 		{
-			"id": "9bc6399a-d2bb-4f2d-9ffa-8480370d383c",
 			"key": "authToken",
 			"value": "",
 			"type": "string"
