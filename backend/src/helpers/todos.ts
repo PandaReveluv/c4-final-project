@@ -1,39 +1,44 @@
 import { TodosAccess } from './todosAcess'
-import { AttachmentUtils } from './attachmentUtils';
-import { TodoItem } from '../models/TodoItem'
+import { getUploadUrl } from './attachmentUtils';
 import { CreateTodoRequest } from '../requests/CreateTodoRequest'
 import { UpdateTodoRequest } from '../requests/UpdateTodoRequest'
 import { createLogger } from '../utils/logger'
 import * as uuid from 'uuid'
-import * as createError from 'http-errors'
-import * as AWS from 'aws-sdk';
 
-const dynamoDBClient = new AWS.DynamoDB.DocumentClient
+const todosAccess = new TodosAccess
+const logger = createLogger('TodosAccess')
 
 // TODO: Implement businessLogic
 export async function getTodosForUser(userId: string) {
-    let result:TodoItem[]
-    const items = await dynamoDBClient
-    .query({
-      TableName: 'Items',
-      IndexName: 'index-name',
-      KeyConditionExpression: 'paritionKey = :paritionKey',
-      ExpressionAttributeValues: {
-        ':paritionKey': userId
-      }
-    })
-    .promise()
+    return await todosAccess.getTodosForUser(userId)
+}
 
-    items.Items.forEach(item => {
-        let toDoItem: TodoItem
-        toDoItem.userId = item.userId
-        toDoItem.todoId = item.todoId
-        toDoItem.createdAt = item.createdAt
-        toDoItem.name = item.name
-        toDoItem.dueDate = item.dueDate
-        toDoItem.done = item.done
-        toDoItem.attachmentUrl = item.attachmentUrl
-        result.push()
-    })
-    return result
+export async function createTodo(newTodo: CreateTodoRequest, userId: string) {
+    let currentData = new Date()
+    logger.info("Begin createTodo...")
+    return await todosAccess.createTodosForUser({
+        todoId: uuid.v4(),
+        userId: userId,
+        createdAt: currentData.toISOString(),
+        name: newTodo.name,
+        dueDate: newTodo.dueDate,
+        done: false
+    }, userId)
+}
+
+export async function updateTodo(updateTodo: UpdateTodoRequest, todoId: string, userId: string) {
+    return await todosAccess.updateTodosForUser({
+        name: updateTodo.name,
+        dueDate: updateTodo.dueDate,
+        done: updateTodo.done
+    }, todoId, userId)
+}
+
+export async function deleteTodo(todoId: string, userId: string) {
+    return await todosAccess.deleteTodosForUser(todoId, userId)
+}
+
+export async function createAttachmentPresignedUrl(todoId: string, attachmentId: string, userId: string) {
+    let attachmentUrl = await getUploadUrl(attachmentId)
+    return await todosAccess.generateUploadUrl(attachmentUrl, todoId, userId)
 }

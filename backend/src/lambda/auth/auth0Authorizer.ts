@@ -1,7 +1,7 @@
 import { CustomAuthorizerEvent, CustomAuthorizerResult } from 'aws-lambda'
 import 'source-map-support/register'
 
-import { verify, decode, VerifyErrors, Secret} from 'jsonwebtoken'
+import { verify, decode} from 'jsonwebtoken'
 import { createLogger } from '../../utils/logger'
 import { Jwt } from '../../auth/Jwt'
 import { JwtPayload } from '../../auth/JwtPayload'
@@ -13,21 +13,19 @@ var jwksClient = require('jwks-rsa');
 // to verify JWT token signature.
 // To get this URL you need to go to an Auth0 page -> Show Advanced Settings -> Endpoints -> JSON Web Key Set
 const jwksUrl = 'https://dev-q1cnabul.us.auth0.com/.well-known/jwks.json'
-const kid = 'aloaloalo'
 
 var client = jwksClient({
   jwksUri: jwksUrl
 });
-function getKey(): Secret {
-  let signingKey: Secret
-  client.getSigningKey(kid, function(err: VerifyErrors, key: Secret) {
+async function getKey(header, callback) {
+  client.getSigningKey(header.pid, function(err, key) {
     if (err) {
       logger.error("Unexpected get JWT error")
       return undefined;
     }
-    signingKey = key
+    var signingKey = key.publicKey || key.rsaPublicKey;
+    callback(null, signingKey)
   });
-  return signingKey;
 }
 
 export const handler = async (
@@ -73,17 +71,21 @@ export const handler = async (
 async function verifyToken(authHeader: string): Promise<JwtPayload> {
   const token = getToken(authHeader)
   const jwt: Jwt = decode(token, { complete: true }) as Jwt
-  logger.info("Plain JWT: " + jwt)
-  let jwtPayload
-  try {
-    jwtPayload = verify(token, getKey())
-  } catch (exception) {
-    logger.error(exception.message)
-    throw new Error('Invalid JWT token')
-  }
-  let result: JwtPayload
-  result = jwtPayload
-
+  let result = jwt.payload
+  logger.info("Plain JWT: " + jwt.payload)
+  verify(token, getKey, function(err, decodedJwtPayload) {
+    if (err) {
+      logger.error(err.message)
+      throw new Error('Invalid JWT token')
+    }
+    if (decodedJwtPayload['sub'] != result.sub
+    || decodedJwtPayload['iss'] != result.iss
+    || decodedJwtPayload['iat'] != result.iat
+    || decodedJwtPayload['exp'] != result.exp
+    ) {
+      throw new Error('Incorrect JWT token')
+    }
+  });
   // TODO: Implement token verification
   // You should implement it similarly to how it was implemented for the exercise for the lesson 5
   // You can read more about how to do this here: https://auth0.com/blog/navigating-rs256-and-jwks/
