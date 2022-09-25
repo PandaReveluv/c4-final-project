@@ -40,6 +40,17 @@ provider:
             - xray:PutTelemetryRecords
             - xray:PutTraceSegments
           Resource: "*"
+        - Effect: Allow
+          Action:
+            - dynamodb:Scan
+            - dynamodb:PutItem
+            - dynamodb:GetItem
+            - dynamodb:Query
+          Resource: arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.TODOS_TABLE}
+        - Effect: Allow
+          Action:
+            - dynamodb:Query
+          Resource: arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.TODOS_TABLE}/index/${self:provider.environment.TODOS_CREATED_AT_INDEX}
 
 
 functions:
@@ -71,7 +82,7 @@ functions:
           cors: true
           authorizer: Auth
           request:
-            schemas:
+            schema:
               application/json: ${file(models/create-todo-model.json)}
 
   # TODO: Configure this function
@@ -173,6 +184,7 @@ resources:
               AllowedOrigins:
               - '*'
               ExposedHeaders:
+              - '*'
               Id: myCORSRuleId2
               MaxAge: 1800
 
@@ -183,18 +195,18 @@ resources:
       Properties:
         Bucket: !Ref AttachmentsBucket
         PolicyDocument:
-        Version: 2012-10-17
-        Statement:
-          - Action:
-              - 's3:GetObject'
-            Effect: Allow
-            Resource: !Join
-            - ''
-            - - 'arn:aws:s3:::'
-              - !Ref AttachmentsBucket
-              - /*
-            Principal: '*'
-            Condition:
-              StringLike:
-                'aws:Referer':
-                  - '*'
+          Version: 2012-10-17
+          Statement:
+            - Action:
+                - 's3:GetObject'
+              Effect: Allow
+              Resource: !Join
+                - ''
+                - - 'arn:aws:s3:::'
+                  - !Ref AttachmentsBucket
+                  - /*
+              Principal: '*'
+              Condition:
+                StringLike:
+                  'aws:Referer':
+                    - '*'
