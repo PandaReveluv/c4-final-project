@@ -7,6 +7,8 @@ plugins:
   - serverless-webpack
   - serverless-iam-roles-per-function
   - serverless-plugin-tracing
+  - serverless-reqvalidator-plugin
+  - serverless-aws-documentation
 
 provider:
   name: aws
@@ -48,6 +50,12 @@ provider:
             - dynamodb:Query
           Resource: arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.TODOS_TABLE}/index/${self:provider.environment.TODOS_CREATED_AT_INDEX}
 
+custom:
+  documentation:
+    models:
+      - name: TodoRequest
+        contentType: application/json
+        schema: ${file(models/create-todo-model.json)}
 
 functions:
 
@@ -83,9 +91,10 @@ functions:
           path: todos
           cors: true
           authorizer: Auth
-          request:
-            schema:
-              application/json: ${file(models/create-todo-model.json)}
+          reqValidatorName: RequestValidator
+          documentation:
+            requestModels:
+              'application/json': TodoRequest
     iamRoleStatements:
       - Effect: Allow
         Action:
@@ -231,3 +240,10 @@ resources:
               Effect: Allow
               Resource: 'arn:aws:s3:::${self:provider.environment.ATTACHMENT_S3_BUCKET}/*'
               Principal: '*'
+    RequestValidator:
+      Type: AWS::ApiGateway::RequestValidator
+      Properties:
+        Name: 'request-validator'
+        RestApiId: !Ref ApiGatewayRestApi
+        ValidateRequestBody: true
+        ValidateRequestParameters: false
