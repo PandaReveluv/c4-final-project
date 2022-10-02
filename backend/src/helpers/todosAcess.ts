@@ -43,7 +43,7 @@ export class TodosAccess {
   async updateTodosForUser(updateTodoItem: TodoUpdate, todoId: string, userId: string) {
     this.logger.info(`Try to update ToDo item ${todoId} for user ${userId}`)
 
-    if (!this.getTodosForUserWithTodoId(userId, todoId)) {
+    if (!(await this.getTodosForUserWithTodoId(userId, todoId))) {
       this.logger.error(`Todo item id is not exist for user ${userId}`)
       throw new Error(`Not found todo item id for user ${userId}`)
     }
