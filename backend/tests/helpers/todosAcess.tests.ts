@@ -17,6 +17,10 @@ const toDoName = "todoName"
 const userId = "user"
 const mockAwsRequest: AWS.Request<AWS.DynamoDB.DocumentClient.QueryOutput, AWS.AWSError> = new Request(new Service(), '');
 
+afterEach(() => {
+    jest.clearAllMocks();
+});
+
 describe('Testing getTodosForUser', () => {
 
     test('Success get ToDos for user', async () => {
@@ -131,7 +135,6 @@ describe('Testing updateTodosForUser', () => {
             Items: expectedToDoItems
         };
         (documentClient.query as jest.Mock).mockReturnValue(mockAwsRequest);
-        (documentClient.update as jest.Mock).mockReturnValue(mockAwsRequest);
         (AWS.Request.prototype.promise as jest.Mock).mockReturnValue(expectedQueryOutput);
         try {
             await todosAccess.updateTodosForUser(expectedTodoItem, "todoId", userId)
@@ -204,7 +207,6 @@ describe('Testing generateUploadUrl', () => {
             Items: expectedToDoItems
         };
         (documentClient.query as jest.Mock).mockReturnValue(mockAwsRequest);
-        (documentClient.update as jest.Mock).mockReturnValue(mockAwsRequest);
         (AWS.Request.prototype.promise as jest.Mock).mockReturnValue(expectedQueryOutput);
         try {
             await todosAccess.generateUploadUrl("attachmentId", "todoId", userId)
