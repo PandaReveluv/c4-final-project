@@ -3,10 +3,12 @@ import 'source-map-support/register'
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda'
 import * as middy from 'middy'
 import { cors, httpErrorHandler } from 'middy/middlewares'
-import { createPresignedUrl } from '../../helpers/attachmentUtils'
+import { AttachmentUtils } from '../../helpers/attachmentUtils'
 import { createAttachmentPresignedUrl } from '../../helpers/todos'
 import { getUserId } from '../utils'
 import * as uuid from 'uuid'
+
+const attachmentUtils = new AttachmentUtils
 
 export const handler = middy(
   async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
@@ -14,7 +16,7 @@ export const handler = middy(
     // TODO: Return a presigned URL to upload a file for a TODO item with the provided id
     let userId: string = getUserId(event)
     let attachmentId = uuid.v4()
-    let presignedUrl = await createPresignedUrl(attachmentId)
+    let presignedUrl = await attachmentUtils.createPresignedUrl(attachmentId)
     await createAttachmentPresignedUrl(todoId, attachmentId, userId)
 
     return {

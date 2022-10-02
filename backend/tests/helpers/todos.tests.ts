@@ -1,13 +1,21 @@
-import { getUploadUrl } from "../../src/helpers/attachmentUtils";
+import { AttachmentUtils } from "../../src/helpers/attachmentUtils";
 import { createAttachmentPresignedUrl, createTodo, deleteTodo, getTodosForUser, updateTodo } from "../../src/helpers/todos";
 import { TodosAccess } from "../../src/helpers/todosAcess"
 import { TodoItem } from "../../src/models/TodoItem";
 import { CreateTodoRequest } from "../../src/requests/CreateTodoRequest";
 import { UpdateTodoRequest } from "../../src/requests/UpdateTodoRequest";
+import * as AWSXRay from 'aws-xray-sdk';
+import * as AWS from 'aws-sdk'
 
 jest.mock('../../src/helpers/todosAcess')
 jest.mock('../../src/helpers/attachmentUtils')
+jest.spyOn(AWSXRay, 'captureAWS')
 
+const XAWS = AWSXRay.captureAWS(AWS)
+const S3 = new XAWS.S3({
+    signatureVersion: 'v4'
+})
+const attachmentUtils = new AttachmentUtils(S3)
 const currentDate = new Date()
 const toDoName = "todoName"
 const userId = "user"
@@ -135,7 +143,7 @@ describe('Testing createAttachmentPresignedUrl', () => {
         const todoId = "toDoId";
         const attachmentId = "attachmentId";
         const attachmentUrl = "https://somepicture.com";
-        (getUploadUrl as jest.Mock).mockReturnValue(attachmentUrl);
+        (attachmentUtils.getUploadUrl as jest.Mock).mockReturnValue(attachmentUrl);
         (TodosAccess.prototype.generateUploadUrl as jest.Mock).mockReturnValue('');
         try {
             const result = await createAttachmentPresignedUrl(todoId, attachmentId, userId)
@@ -150,7 +158,7 @@ describe('Testing createAttachmentPresignedUrl', () => {
         const attachmentId = "attachmentId";
         const attachmentUrl = "https://somepicture.com";
         const error = new Error(`Not found todo item id for user ${userId}`);
-        (getUploadUrl as jest.Mock).mockReturnValue(attachmentUrl);
+        (attachmentUtils.getUploadUrl as jest.Mock).mockReturnValue(attachmentUrl);
         (TodosAccess.prototype.generateUploadUrl as jest.Mock).mockRejectedValue(error);
         try {
             const result = await createAttachmentPresignedUrl(todoId, attachmentId, userId)
