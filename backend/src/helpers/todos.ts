@@ -1,5 +1,5 @@
 import { TodosAccess } from './todosAcess'
-import { getUploadUrl } from './attachmentUtils';
+import { AttachmentUtils } from './attachmentUtils';
 import { CreateTodoRequest } from '../requests/CreateTodoRequest'
 import { UpdateTodoRequest } from '../requests/UpdateTodoRequest'
 import { createLogger } from '../utils/logger'
@@ -7,6 +7,7 @@ import * as uuid from 'uuid'
 
 const todosAccess = new TodosAccess
 const logger = createLogger('TodosAccess')
+const attachmentUtils = new AttachmentUtils
 
 // TODO: Implement businessLogic
 export async function getTodosForUser(userId: string) {
@@ -39,6 +40,6 @@ export async function deleteTodo(todoId: string, userId: string) {
 }
 
 export async function createAttachmentPresignedUrl(todoId: string, attachmentId: string, userId: string) {
-    let attachmentUrl = await getUploadUrl(attachmentId)
+    let attachmentUrl = await attachmentUtils.getUploadUrl(attachmentId)
     return await todosAccess.generateUploadUrl(attachmentUrl, todoId, userId)
 }
