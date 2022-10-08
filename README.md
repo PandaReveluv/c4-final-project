@@ -10,7 +10,8 @@ Make sure you have installed Serverless CLI in your computer, then run command t
 - *serverless* 
 
 Then set up your AWS Profile for Serverless, you can modify AWS credentials file:
-// add image
+![image](https://user-images.githubusercontent.com/62783730/194715745-0c3b1aa5-aa77-4858-a211-30a167730184.png)
+
 
 Finally, you can run this command to start deployment to AWS:
 - *npm run deploy:test*
