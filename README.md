@@ -2,6 +2,28 @@
 
 To implement this project, you need to implement a simple TODO application using AWS Lambda and Serverless framework. Search for all comments starting with the `TODO:` in the code to find the placeholders that you need to implement.
 
+# Deployment
+
+## Backend
+
+Make sure you have installed Serverless CLI in your computer, then run command to initialize your app in Serverless:
+- *serverless* 
+
+Then set up your AWS Profile for Serverless, you can modify AWS credentials file:
+// add image
+
+Finally, you can run this command to start deployment to AWS:
+- *npm run deploy:test*
+
+Notes: the command *npm run deploy:test* will return code 1 but it still deploy to AWS successful.
+
+## Frontend
+
+Remember to modify *apiId*, *domain*, *clientId*, *callbackUrl* in config.ts file for Frontend
+
+Then you can run *eb init*, *eb create*, *eb deploy* to start AWS EB deployment 
+
+
 # Functionality of the application
 
 This application will allow creating/removing/updating/fetching TODO items. Each TODO item can optionally have an attachment image. Each user only has access to TODO items that he/she has created.
