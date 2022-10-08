@@ -42,7 +42,8 @@
     "test": "tests"
   },
   "scripts": {
-    "test": "jest --debug"
+    "test": "jest --debug",
+    "deploy:test": "npm i && jest && sls deploy --aws-profile serverless"
   },
   "author": "Ivan Mushketyk",
   "license": "MIT"
