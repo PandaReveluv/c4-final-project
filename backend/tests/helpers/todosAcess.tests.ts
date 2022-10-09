@@ -1,4 +1,4 @@
-import { TodosAccess } from "../../src/helpers/todosAcess"
+import { TodosAccess } from "../../src/helpers/BussinessLogic/todosAcess"
 import { TodoItem } from "../../src/models/TodoItem"
 import { createLogger } from "../../src/utils/logger"
 import { DocumentClient } from "aws-sdk/clients/dynamodb"
