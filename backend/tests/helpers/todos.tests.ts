@@ -1,14 +1,14 @@
-import { AttachmentUtils } from "../../src/helpers/attachmentUtils";
-import { createAttachmentPresignedUrl, createTodo, deleteTodo, getTodosForUser, updateTodo } from "../../src/helpers/todos";
-import { TodosAccess } from "../../src/helpers/todosAcess"
+import { AttachmentUtils } from "../../src/helpers/DataAccess/attachmentUtils";
+import { createAttachmentPresignedUrl, createTodo, deleteTodo, getTodosForUser, updateTodo } from "../../src/helpers/BussinessLogic/todos";
+import { TodosAccess } from "../../src/helpers/BussinessLogic/todosAcess"
 import { TodoItem } from "../../src/models/TodoItem";
 import { CreateTodoRequest } from "../../src/requests/CreateTodoRequest";
 import { UpdateTodoRequest } from "../../src/requests/UpdateTodoRequest";
 import * as AWSXRay from 'aws-xray-sdk';
 import * as AWS from 'aws-sdk'
 
-jest.mock('../../src/helpers/todosAcess')
-jest.mock('../../src/helpers/attachmentUtils')
+jest.mock('../../src/helpers/BussinessLogic/todosAcess')
+jest.mock('../../src/helpers/DataAccess/attachmentUtils')
 jest.spyOn(AWSXRay, 'captureAWS')
 
 const XAWS = AWSXRay.captureAWS(AWS)

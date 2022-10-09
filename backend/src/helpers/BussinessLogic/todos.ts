@@ -1,8 +1,8 @@
 import { TodosAccess } from './todosAcess'
-import { AttachmentUtils } from './attachmentUtils';
-import { CreateTodoRequest } from '../requests/CreateTodoRequest'
-import { UpdateTodoRequest } from '../requests/UpdateTodoRequest'
-import { createLogger } from '../utils/logger'
+import { AttachmentUtils } from '../DataAccess/attachmentUtils';
+import { CreateTodoRequest } from '../../requests/CreateTodoRequest'
+import { UpdateTodoRequest } from '../../requests/UpdateTodoRequest'
+import { createLogger } from '../../utils/logger'
 import * as uuid from 'uuid'
 
 const todosAccess = new TodosAccess

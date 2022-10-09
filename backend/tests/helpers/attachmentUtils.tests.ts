@@ -1,4 +1,4 @@
-import { AttachmentUtils } from "../../src/helpers/attachmentUtils";
+import { AttachmentUtils } from "../../src/helpers/DataAccess/attachmentUtils";
 import * as AWS from 'aws-sdk';
 import * as AWSXRay from 'aws-xray-sdk';
 
